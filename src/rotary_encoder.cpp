@@ -7,8 +7,6 @@
 
 #include "config.hpp"
 
-static const char *TAG = "rotary_encoder";
-
 namespace tt_motor {
 
 bool Encoder::pcnt_isr_service_installed_ = false;

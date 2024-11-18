@@ -18,12 +18,13 @@ Controller::Controller(const Controller::Config cfg)
   pinMode(gpio_stby_, OUTPUT);
 
   // init gpio unit, timer, gen
-  mcpwm_config_t pwm_config;
-  pwm_config.frequency = cfg.frequency;
-  pwm_config.cmpr_a = 0.0f;  // initial duty cycle of PWMxA = 0
-  pwm_config.cmpr_b = 0.0f;  // initial duty cycle of PWMxb = 0
-  pwm_config.counter_mode = MCPWM_UP_COUNTER;  // up counting mode
-  pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
+  mcpwm_config_t pwm_config = {
+      .frequency = cfg.frequency,
+      .cmpr_a = 0.0f,  // initial duty cycle of PWMxA = 0
+      .cmpr_b = 0.0f,  // initial duty cycle of PWMxb = 0
+      .duty_mode = MCPWM_DUTY_MODE_0,
+      .counter_mode = MCPWM_UP_COUNTER,  // up counting mode
+  };
   mcpwm_init(unit_, timer_, &pwm_config);
 }
 

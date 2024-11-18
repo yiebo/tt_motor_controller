@@ -2,46 +2,49 @@
 
 #include <Arduino.h>
 
+#include <functional>
+
 namespace PID {
-class PID {
+
+class PIDController {
  public:
-  enum ControlType {
-    POSITION,
-    SPEED,
+  enum pid_calculate_type_t {
+    PID_CALC_TYPE_INCREMENTAL, /*!< Incremental PID control */
+    PID_CALC_TYPE_POSITIONAL,  /*!< Positional PID control */
   };
-  struct PIDConfig {
-    ControlType ctrl_type;
-    float k_p_;
-    float k_i_;
-    float k_d_;
+  struct pid_ctrl_config_t {
+    float kp;                        // PID Kp parameter
+    float ki;                        // PID Ki parameter
+    float kd;                        // PID Kd parameter
+    float max_output;                // PID maximum output limitation
+    float min_output;                // PID minimum output limitation
+    float max_integral;              // PID maximum integral value limitation
+    float min_integral;              // PID minimum integral value limitation
+    pid_calculate_type_t calc_type;  // PID calculation type
   };
-
-  PID(const PIDConfig cfg);
-
-  void set_PID(const float k_p, const float k_i, const float k_d);
-
-  void clear();
+  PIDController(const pid_ctrl_config_t cfg);
+  void update_param(const pid_ctrl_config_t config);
+  float compute(const float error);
+  void reset();
 
  private:
-  float k_p_;
-  float k_i_;
-  float k_d_;
+  pid_calculate_type_t calc_type_;  // PID calculation type
+  float kp_;                        // PID Kp parameter
+  float ki_;                        // PID Ki parameter
+  float kd_;                        // PID Kd parameter
+  float previous_err1_ = 0;         // e(k-1)
+  float previous_err2_ = 0;         // e(k-2)
+  float integral_err_ = 0;          // Sum of error
+  float last_output_ = 0;           // PID output in last control period
 
-  /* history variables */
-  float previous_err1_;            // e(k-1)
-  float previous_err2_;            // e(k-2)
-  float integral_err_;             // Sum of error
-  float last_output_;              // PID output in last control period
+  float max_output_;    // PID maximum output limitation
+  float min_output_;    // PID minimum output limitation
+  float max_integral_;  // PID maximum integral value limitation
+  float min_integral_;  // PID minimum integral value limitation
 
-  /* limitation */
-  float max_output_limit_;         // PID maximum output limitation
-  float min_output_limit_;         // PID minimum output limitation
-  float max_integral_limit_;       // PID maximum integral value limitation
-  float min_integral_limit_;       // PID minimum integral value limitation
-
-  /* PID calculation function type (Set by user) */
-  ControlType ctrl_type;      // PID calculation type
-
+  std::function<float(const float)> calc_func;
+  float calc_incremental(const float error);
+  float calc_positional(const float error);
 };
 
 }  // namespace PID

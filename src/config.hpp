@@ -8,6 +8,7 @@
 #include "custom_mcpwm.hpp"
 #include "rotary_encoder.hpp"
 #include "tb6612fng.hpp"
+#include "controller_timer.hpp"
 
 namespace tt_motor {
 
@@ -51,3 +52,12 @@ constexpr Encoder::PcntConfig enc_a_cfg = {
 // };
 
 }  // namespace tt_motor
+
+namespace PID {
+
+constexpr controller_timer::Timer::config timer_cfg = {
+    .timer_group = TIMER_GROUP_0,
+    .timer_idx = TIMER_0,
+    .period_ms = 10,
+};
+} // namespace PID
